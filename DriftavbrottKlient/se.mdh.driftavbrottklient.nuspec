@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>SE.MDH.DriftavbrottKlient</id>
+    <version>1.0.0.0</version>
+    <title>SE.MDH.DriftavbrottKlient</title>
+    <authors>Lars Lindqvist, Robert Isaksson, Daniel Blomberg</authors>
+    <owners>Malardalens University</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>
+      A client for interacting with mdh-driftavbrott-service.
+    </description>
+    <copyright>Copyright Malardalens University 2017</copyright>
+    <tags>http, rest, driftavbrott</tags>
+    <dependencies>
+      <dependency id="FluentUriBuilder" version="1.3.1"/>
+      <dependency id="RestSharp" version="106.2.1"/>
+      <dependency id="System.ValueTuple" version="4.4.0"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="se.mdh.driftavbrottklient.dll" target="lib\net45\" />
+    <file src="se.mdh.driftavbrottklient.pdb" target="lib\net45\" />
+    <file src="se.mdh.driftavbrottklient.xml" target="lib\net45\" />
+  </files>
+</package>

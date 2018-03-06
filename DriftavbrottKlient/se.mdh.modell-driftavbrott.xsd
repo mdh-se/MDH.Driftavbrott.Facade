@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://www.mdh.se/xsd/se.mdh.modell-driftavbrott-1.0.0.xsd" targetNamespace="http://www.mdh.se/xsd/se.mdh.modell-driftavbrott-1.0.0.xsd" version="1.0.0">
+  <xs:element name="driftavbrott" type="driftavbrottType"/>
+  <xs:complexType name="driftavbrottType">
+    <xs:annotation>
+      <xs:documentation><![CDATA[Representerar ett driftavbrott.]]></xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element name="kanal" type="xs:string">
+        <xs:annotation>
+          <xs:documentation><![CDATA[Kanal för driftavbrottet.]]></xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="start" type="xs:dateTime">
+        <xs:annotation>
+          <xs:documentation><![CDATA[Datum och tid då driftavbrottet startar.]]></xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="slut" type="xs:dateTime">
+        <xs:annotation>
+          <xs:documentation><![CDATA[Datum och tid då driftavbrottet slutar.]]></xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="niva" type="nivaType">
+        <xs:annotation>
+          <xs:documentation><![CDATA[Nivå på driftavbrottet.]]></xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="meddelande_sv" type="xs:string">
+        <xs:annotation>
+          <xs:documentation><![CDATA[Meddelande på svenska.]]></xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="meddelande_en" type="xs:string">
+        <xs:annotation>
+          <xs:documentation><![CDATA[Meddelande på engelska.]]></xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+
+  <xs:simpleType name="nivaType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="INFO"/>
+      <xs:enumeration value="WARN"/>
+      <xs:enumeration value="ERROR"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
