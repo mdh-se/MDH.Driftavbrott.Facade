@@ -59,6 +59,6 @@ Ange följande i applikationens konfiguration:
   </configSections>
 
   <!-- Exempelkonfiguration -->
-  <se.mdh.driftavbrottklient server="localhost" port="3301" baseuri="mdh-driftavbrott/v1" systemid="DriftavbrottKlient-Test" />
+  <se.mdh.driftavbrottklient server="localhost" port="3301" systemid="DriftavbrottKlient-Test" />
 </configuration>
 ```
