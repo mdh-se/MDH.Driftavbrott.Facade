@@ -25,13 +25,11 @@ namespace SE.MDH.DriftavbrottKlient
     #region Privata konstanter
 
     // Konstant för bas uri
-    private const string BaseUri = "mdh-driftavbrott/v1";
+    private const string BASE_URI = "mdh-driftavbrott/v1";
     // Konstanter mot REST-resurser och queryparametrar
-    private const string PagaendePath = "/driftavbrott/pagaende";
-    private const string KanalParam = "kanal";
-    private const string SystemParam = "system";
-    // Systemid om det inte anges
-    private const string DefaultSystemId = "NA";
+    private const string PÅGÅENDE_PATH= "/driftavbrott/pagaende";
+    private const string KANAL_PARAM = "kanal";
+    private const string SYSTEM_PARAM = "system";
 
     #endregion
 
@@ -105,15 +103,15 @@ namespace SE.MDH.DriftavbrottKlient
           .Scheme(UriScheme.Http)
           .Host(myServer)
           .Port(myPort)
-          .Path(BaseUri + PagaendePath);
+          .Path(BASE_URI + PÅGÅENDE_PATH);
 
       foreach (var kanal in kanaler)
       {
-        builder = builder.QueryParam(KanalParam, kanal);
+        builder = builder.QueryParam(KANAL_PARAM, kanal);
       }
 
       // Släng in systemId som parameter till tjänsten, som alltid är ett krav
-      builder = builder.QueryParam(SystemParam, mySystemId);
+      builder = builder.QueryParam(SYSTEM_PARAM, mySystemId);
 
       // REST client
       RestClient restClient = new RestClient
