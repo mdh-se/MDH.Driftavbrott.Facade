@@ -42,6 +42,8 @@ namespace SE.MDH.DriftavbrottKlient
     /// <summary>SystemId som används</summary>
     private string mySystemId;
 
+    private bool myHttps;
+
     #endregion
 
     #region Publika egenskaper
@@ -62,6 +64,7 @@ namespace SE.MDH.DriftavbrottKlient
         myServer = CurrentConfiguration.Server;
         myPort = CurrentConfiguration.Port;
         mySystemId = CurrentConfiguration.SystemId;
+        myHttps = CurrentConfiguration.Https;
       }
       catch (Exception e)
       {
@@ -70,7 +73,7 @@ namespace SE.MDH.DriftavbrottKlient
     }
     /// <summary>Kontruktor som används vid programatisk konfiguration.</summary>
     /// <exception cref="ArgumentNullException"></exception>
-    public DriftavbrottKlient(string server, int port, string systemid)
+    public DriftavbrottKlient(string server, int port, string systemid, bool https = false)
     {
       if (String.IsNullOrEmpty(server))
       {
@@ -83,6 +86,7 @@ namespace SE.MDH.DriftavbrottKlient
       myServer = server;
       myPort = port;
       mySystemId = systemid;
+      myHttps = https;
     }
 
     #endregion
@@ -100,7 +104,7 @@ namespace SE.MDH.DriftavbrottKlient
     {
       // Använder ett tredjeparts-lib för att snyggt bygga en URI
       FluentUriBuilder builder = FluentUriBuilder.Create()
-          .Scheme(UriScheme.Http)
+          .Scheme(myHttps ? UriScheme.Https : UriScheme.Http)
           .Host(myServer)
           .Port(myPort)
           .Path(BASE_URI + PÅGÅENDE_PATH);

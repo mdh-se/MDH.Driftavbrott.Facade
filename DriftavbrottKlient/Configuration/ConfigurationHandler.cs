@@ -12,24 +12,31 @@ namespace SE.MDH.DriftavbrottKlient.Configuration
     [ConfigurationProperty("port", IsRequired = true)]
     public int Port
     {
-      get { return (int)this["port"]; }
-      set { this["port"] = value; }
+      get => (int)this["port"];
+      set => this["port"] = value;
     }
 
     /// <summary>Server</summary>
     [ConfigurationProperty("server", IsRequired = true)]
     public string Server
     {
-      get { return (string)this["server"]; }
-      set { this["server"] = value; }
+      get => (string)this["server"];
+      set => this["server"] = value;
     }
 
     /// <summary>Kännetecknar systemet som anropar mdh-driftavbrott-service</summary>
     [ConfigurationProperty("systemid", IsRequired = true)]
     public string SystemId
     {
-      get { return (string)this["systemid"]; }
-      set { this["systemid"] = value; }
+      get => (string)this["systemid"];
+      set => this["systemid"] = value;
+    }
+
+    [ConfigurationProperty("https", IsRequired = false, DefaultValue = false)]
+    public bool Https
+    {
+      get => (bool)this["https"];
+      set => this["https"] = value;
     }
   }
 }

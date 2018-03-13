@@ -60,5 +60,7 @@ Ange följande i applikationens konfiguration:
 
   <!-- Exempelkonfiguration -->
   <se.mdh.driftavbrottklient server="localhost" port="3301" systemid="DriftavbrottKlient-Test" />
+  <!--<se.mdh.driftavbrottklient server="localhost" port="3301" systemid="DriftavbrottKlient-Test" https="true" />-->
+
 </configuration>
 ```

@@ -31,6 +31,8 @@ namespace SE.MDH.DriftavbrottKlient.Configuration
     public static string Server => myConfiguration.Server;
     /// <summary>System</summary>
     public static string SystemId => myConfiguration.SystemId;
+    /// <summary>Https</summary>
+    public static bool Https => myConfiguration.Https;
 
     #endregion
 
