@@ -139,26 +139,22 @@ namespace SE.MDH.DriftavbrottKlient
 
       // Gör anropet
       IRestResponse<driftavbrottType> restResponse = restClient.Execute<driftavbrottType>(restRequest);
-      if (restResponse.IsSuccessful)
+      // Servern returnerad inga driftavbrott.
+      if (restResponse.StatusCode == HttpStatusCode.NotFound)
       {
-        // Servern returnerad inga driftavbrott.
-        if (restResponse.StatusCode == HttpStatusCode.NotFound)
+        return Enumerable.Empty<driftavbrottType>();
+      }
+      // Servern returnerade driftavbrott.
+      if (restResponse.StatusCode == HttpStatusCode.OK)
+      {
+        if (restResponse.Data == null)
         {
           return Enumerable.Empty<driftavbrottType>();
         }
-        // Servern returnerade driftavbrott.
-        if (restResponse.StatusCode == HttpStatusCode.OK)
+        else
         {
-          if (restResponse.Data == null)
-          {
-            return Enumerable.Empty<driftavbrottType>();
-          }
-          else
-          {
-            return new[] { restResponse.Data };
-          }
+          return new[] { restResponse.Data };
         }
-        throw new ApplicationException($"Oväntat fel inträffade. ResponseCode={restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
       }
       throw new ApplicationException($"Oväntat fel inträffade. ResponseCode={restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
     }
