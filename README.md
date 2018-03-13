@@ -6,7 +6,7 @@ En .NET-klient som kan kommunicera med mdh-driftavbrott-service.
 
 Här följer ett exempel på lite C#-kod:
 
-```
+```C#
     DriftavbrottKlient client = new DriftavbrottKlient();
     String[] kanaler = new [] { "ladok.backup" };
     try
@@ -29,7 +29,7 @@ Här följer ett exempel på lite C#-kod:
 
 Här följer ett exempel på lite C#-kod:
 
-```
+```C#
     DriftavbrottKlient client = new DriftavbrottKlient("server.domain", 23456, "mitt-system");
     String[] kanaler = new [] { "ladok.backup" };
     try
@@ -52,7 +52,7 @@ Här följer ett exempel på lite C#-kod:
 
 Ange följande i applikationens konfiguration:
 
-```
+```XML
 <configuration>
   <configSections>
     <section name="se.mdh.driftavbrottklient" type="SE.MDH.DriftavbrottKlient.Configurations.ConfigurationHandler, se.mdh.driftavbrottklient"/>
