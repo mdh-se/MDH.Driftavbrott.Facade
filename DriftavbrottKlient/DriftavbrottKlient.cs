@@ -72,6 +72,10 @@ namespace SE.MDH.DriftavbrottKlient
       }
     }
     /// <summary>Kontruktor som används vid programatisk konfiguration.</summary>
+    /// <param name="server">Server</param>
+    /// <param name="port">Port</param>
+    /// <param name="systemid">Systemets namn</param>
+    /// <param name="https">Https</param>
     /// <exception cref="ArgumentNullException"></exception>
     public DriftavbrottKlient(string server, int port, string systemid, bool https = false)
     {

@@ -60,6 +60,9 @@
     <Compile Include="Configuration\ConfigurationHandler.cs" />
     <Compile Include="Configuration\CurrentConfiguration.cs" />
     <Compile Include="DriftavbrottKlient.cs" />
+    <Compile Include="DriftavbrottMonitor.cs" />
+    <Compile Include="DriftavbrottStatus.cs" />
+    <Compile Include="DriftavbrottStatusEvent.cs" />
     <Compile Include="Model\driftavbrottType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
