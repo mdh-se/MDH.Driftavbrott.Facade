@@ -139,7 +139,7 @@ namespace SE.MDH.DriftavbrottKlient
       /// <summary>
       /// Kanaler som monitorn skall använda
       /// </summary>
-      private Dictionary<String, DriftavbrottStatus> kanalStatus = new Dictionary<string, DriftavbrottStatus>();
+      private Dictionary<String, Kanal> kanalStatus = new Dictionary<String, Kanal>();
       /// <summary>
       /// Händelsedelegat
       /// </summary>
@@ -164,7 +164,7 @@ namespace SE.MDH.DriftavbrottKlient
         this.client = client;
         foreach (string s in kanaler)
         {
-          kanalStatus.Add(s, MDH.DriftavbrottKlient.DriftavbrottStatus.Saknas);
+          kanalStatus.Add(s, new Kanal(s));
         }
       }
       #endregion
@@ -208,13 +208,17 @@ namespace SE.MDH.DriftavbrottKlient
         while (shouldStop == false)
         {
           string[] kanaler = kanalStatus.Keys.ToArray();
-          foreach (driftavbrottType avbrott in client.GetPagaendeDriftavbrott(kanaler))
+          List<driftavbrottType> kommandeAvbrott = new List<driftavbrottType>();
+          kommandeAvbrott.AddRange(client.GetPagaendeDriftavbrott(kanaler));
+          foreach (driftavbrottType avbrott in kommandeAvbrott)
           {
-            if (DateTime.Now.AddSeconds(-10) > avbrott.start)
+            if (DateTime.Now.AddSeconds(10) > avbrott.start)
             {
-              if (kanalStatus[avbrott.kanal] != MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående)
+              if (kanalStatus[avbrott.kanal].Status != MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående)
               {
-                kanalStatus[avbrott.kanal] = MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående;
+                kanalStatus[avbrott.kanal].Status = MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående;
+                kanalStatus[avbrott.kanal].Start = avbrott.start;
+                kanalStatus[avbrott.kanal].Slut = avbrott.slut;
                 OnDriftavbrottStatusChanged(
                   new DriftavbrottStatusEvent(
                   MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående, 
@@ -223,22 +227,27 @@ namespace SE.MDH.DriftavbrottKlient
                   avbrott.meddelande_en));
               }
             }
-            if (DateTime.Now > avbrott.slut)
+            else
             {
-              if (kanalStatus[avbrott.kanal] == MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående)
-              {
-                kanalStatus[avbrott.kanal] = MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört;
-                OnDriftavbrottStatusChanged(
-                  new DriftavbrottStatusEvent(
-                    MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört,
-                    avbrott.kanal,
-                    string.Empty,
-                    string.Empty));
-              }
+              kanalStatus[avbrott.kanal].Start = avbrott.start;
+              kanalStatus[avbrott.kanal].Slut = avbrott.slut;
             }
             if (shouldStop)
             {
               break;
+            }
+          }
+          foreach (var kanal in kanalStatus)
+          {
+            if (kanal.Value.Slut < DateTime.Now)
+            {
+              kanal.Value.Status = MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört;
+              OnDriftavbrottStatusChanged(
+                new DriftavbrottStatusEvent(
+                  MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört,
+                  kanal.Value.Name,
+                  string.Empty,
+                  string.Empty));
             }
           }
 
@@ -263,6 +272,29 @@ namespace SE.MDH.DriftavbrottKlient
       #endregion
     }
 
+    /// <summary>
+    /// Kanal
+    /// </summary>
+    internal class Kanal
+    {
+      public string Name { get; }
+
+      public DateTime Start { get; set; }
+      public DateTime Slut { get; set; }
+
+      public MDH.DriftavbrottKlient.DriftavbrottStatus Status { get; set; }
+
+      public Kanal(string name)
+      {
+        Name = name;
+        Start = DateTime.MaxValue;
+        Slut = DateTime.MaxValue;
+        Status = MDH.DriftavbrottKlient.DriftavbrottStatus.Saknas;
+      }
+    }
+
     #endregion
   }
+
+  
 }

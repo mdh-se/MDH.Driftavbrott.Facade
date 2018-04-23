@@ -17,7 +17,7 @@ namespace DriftavbrottMonitorTest
     public Form1()
     {
       InitializeComponent();
-      monitor = new DriftavbrottMonitor(new [] { "alltid" });
+      monitor = new DriftavbrottMonitor(new [] { "ladok.uppgradering" });
       monitor.DriftavbrottStatus += Monitor_DriftavbrottStatus;
 
     }
