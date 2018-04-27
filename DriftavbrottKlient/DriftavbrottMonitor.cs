@@ -226,6 +226,11 @@ namespace SE.MDH.DriftavbrottKlient
                   avbrott.meddelande_sv,
                   avbrott.meddelande_en));
               }
+              else
+              {
+                kanalStatus[avbrott.kanal].Start = avbrott.start;
+                kanalStatus[avbrott.kanal].Slut = avbrott.slut;
+              }
             }
             else
             {
@@ -237,17 +242,21 @@ namespace SE.MDH.DriftavbrottKlient
               break;
             }
           }
+
           foreach (var kanal in kanalStatus)
           {
             if (kanal.Value.Slut < DateTime.Now)
             {
-              kanal.Value.Status = MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört;
-              OnDriftavbrottStatusChanged(
-                new DriftavbrottStatusEvent(
-                  MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört,
-                  kanal.Value.Name,
-                  string.Empty,
-                  string.Empty));
+              if (kanal.Value.Status == MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående)
+              {
+                kanal.Value.Status = MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört;
+                OnDriftavbrottStatusChanged(
+                  new DriftavbrottStatusEvent(
+                    MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört,
+                    kanal.Value.Name,
+                    string.Empty,
+                    string.Empty));
+              }
             }
           }
 
