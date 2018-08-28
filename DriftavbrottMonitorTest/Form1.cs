@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using SE.MDH.DriftavbrottKlient;
 
@@ -17,7 +10,7 @@ namespace DriftavbrottMonitorTest
     public Form1()
     {
       InitializeComponent();
-      monitor = new DriftavbrottMonitor(new [] { "ladok.uppgradering" });
+      monitor = new DriftavbrottMonitor(new [] { "ladok.uppgradering", "ladok.backup" });
       monitor.DriftavbrottStatus += Monitor_DriftavbrottStatus;
 
     }
