@@ -12,7 +12,6 @@ namespace DriftavbrottMonitorTest
       InitializeComponent();
       monitor = new DriftavbrottMonitor(new [] { "ladok.uppgradering", "ladok.backup" });
       monitor.DriftavbrottStatus += Monitor_DriftavbrottStatus;
-
     }
 
     private void Monitor_DriftavbrottStatus(object sender, DriftavbrottStatusEvent args)
@@ -36,7 +35,6 @@ namespace DriftavbrottMonitorTest
 
     private void Form1_Load(object sender, EventArgs e)
     {
-
     }
 
     private void Form1_FormClosing(object sender, FormClosingEventArgs e)

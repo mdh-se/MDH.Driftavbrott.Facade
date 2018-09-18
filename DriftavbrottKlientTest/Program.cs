@@ -13,7 +13,7 @@ namespace DriftavbrottKlientTest
       DriftavbrottKlient driftavbrottKlient=null;
       try
       {
-        driftavbrottKlient = GetDriftavbrottKlient(args);
+        driftavbrottKlient = GetDriftavbrottKlient(args);        
       }
       catch (Exception e)
       {
@@ -36,19 +36,19 @@ namespace DriftavbrottKlientTest
         Console.WriteLine(e.Message);
       }
 
-      try
-      {
-        IEnumerable<driftavbrottType> driftavbrott = driftavbrottKlient.GetPagaendeDriftavbrott(new[] { "ladok.backup" });
-        foreach (driftavbrottType driftavbrottType in driftavbrott)
-        {
-          Console.WriteLine($"[kanal={driftavbrottType.kanal}, start={driftavbrottType.start}, slut={driftavbrottType.slut}]");
-        }
-        driftavbrottKlient.Dispose();
-      }
-      catch (Exception e)
-      {
-        Console.WriteLine(e.Message);
-      }
+      //try
+      //{
+      //  IEnumerable<driftavbrottType> driftavbrott = driftavbrottKlient.GetPagaendeDriftavbrott(new[] { "ladok.backup" });
+      //  foreach (driftavbrottType driftavbrottType in driftavbrott)
+      //  {
+      //    Console.WriteLine($"[kanal={driftavbrottType.kanal}, start={driftavbrottType.start}, slut={driftavbrottType.slut}]");
+      //  }
+      //  driftavbrottKlient.Dispose();
+      //}
+      //catch (Exception e)
+      //{
+      //  Console.WriteLine(e.Message);
+      //}
 
       Console.WriteLine();
       Console.WriteLine("Enter för att avsluta.");

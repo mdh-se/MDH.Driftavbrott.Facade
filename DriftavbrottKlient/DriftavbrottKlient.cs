@@ -26,6 +26,7 @@ namespace SE.MDH.DriftavbrottKlient
 
     // Konstant för bas uri
     private const string BASE_URI = "mdh-driftavbrott/v1";
+
     // Konstanter mot REST-resurser och queryparametrar
     private const string PÅGÅENDE_PATH= "/driftavbrott/pagaende";
     private const string KANAL_PARAM = "kanal";
@@ -139,28 +140,47 @@ namespace SE.MDH.DriftavbrottKlient
       };
 
       // Lägg till Header (endast XML accepteras)
-      restRequest.AddHeader("Accept", "application/xml");
+      restRequest.AddHeader("Accept", "application/xml,application/json");
 
       // Gör anropet
       IRestResponse<driftavbrottType> restResponse = restClient.Execute<driftavbrottType>(restRequest);
-      // Servern returnerad inga driftavbrott.
-      if (restResponse.StatusCode == HttpStatusCode.NotFound)
+
+      // Fick vi något svar alls?
+      if(restResponse !=null)
       {
-        return Enumerable.Empty<driftavbrottType>();
-      }
-      // Servern returnerade driftavbrott.
-      if (restResponse.StatusCode == HttpStatusCode.OK)
-      {
-        if (restResponse.Data == null)
+        // Hämta HTTP statuskoden i numerisk form (ex: 200)
+        Int32 numericStatusCode = (Int32) restResponse.StatusCode;
+
+        // Servern returnerade 404 eller 406 (HTTP Statuskod=404)
+        if (restResponse.StatusCode == HttpStatusCode.NotFound)
+        {
+          throw new ApplicationException($"#Ett fel inträffade. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
+        }
+
+        // Servern returnerade inga driftavbrott alls (HTTP Statuskod=204, innehåll saknas)
+        if (restResponse.StatusCode == HttpStatusCode.NoContent)
         {
           return Enumerable.Empty<driftavbrottType>();
         }
-        else
+
+        // Servern returnerade eventuella driftavbrott (HTTP Statuskod=200)
+        if (restResponse.StatusCode == HttpStatusCode.OK)
         {
+          if (restResponse.Data == null)
+          {
+            return Enumerable.Empty<driftavbrottType>();
+          }
+
+          // Data saknas, inga driftavbrott finns
           return new[] { restResponse.Data };
         }
+
+        // Servern returnerade någon form av annan statuskod som ej behandlas specifikt
+        throw new ApplicationException($"#Ett fel inträffade. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
       }
-      throw new ApplicationException($"Oväntat fel inträffade. ResponseCode={restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
+
+      // Servern returnerade inget svar (Response) alls
+      throw new ApplicationException($"#Ett oväntat fel inträffade. Inget svar finns att behandla. RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
     }
 
     #endregion

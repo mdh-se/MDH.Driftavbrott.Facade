@@ -55,7 +55,7 @@ namespace SE.MDH.DriftavbrottKlient
       workerClass.DriftavbrottStatus += WorkerClass_DriftavbrottStatus;
       workerThread = new Thread(workerClass.Start);
       workerThread.Start();
-      while (workerThread.IsAlive != true) {}
+      while (workerThread.IsAlive != true) { }
     }
 
     /// <summary>
@@ -72,16 +72,14 @@ namespace SE.MDH.DriftavbrottKlient
       workerClass.DriftavbrottStatus += WorkerClass_DriftavbrottStatus;
       workerThread = new Thread(workerClass.Start);
       workerThread.Start();
-      while (workerThread.IsAlive != true) {}
+      while (workerThread.IsAlive != true) { }
     }
 
     #endregion
 
     #region privata metoder
 
-    /// <summary>
-    /// Hanterar event
-    /// </summary>
+    /// <summary>/// Hanterar event/// </summary>
     /// <param name="sender">Avsändare</param>
     /// <param name="args"DriftavbrottStatusEvent></param>
     private void WorkerClass_DriftavbrottStatus(object sender, DriftavbrottStatusEvent args)
@@ -210,6 +208,7 @@ namespace SE.MDH.DriftavbrottKlient
           string[] kanaler = kanalStatus.Keys.ToArray();
           List<driftavbrottType> kommandeAvbrott = new List<driftavbrottType>();
           kommandeAvbrott.AddRange(client.GetPagaendeDriftavbrott(kanaler));
+          
           foreach (driftavbrottType avbrott in kommandeAvbrott)
           {
             if (DateTime.Now.AddSeconds(10) > avbrott.start)
@@ -221,8 +220,8 @@ namespace SE.MDH.DriftavbrottKlient
                 kanalStatus[avbrott.kanal].Slut = avbrott.slut;
                 OnDriftavbrottStatusChanged(
                   new DriftavbrottStatusEvent(
-                  MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående, 
-                  avbrott.kanal, 
+                  MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående,
+                  avbrott.kanal,
                   avbrott.meddelande_sv,
                   avbrott.meddelande_en));
               }
@@ -289,6 +288,7 @@ namespace SE.MDH.DriftavbrottKlient
       public string Name { get; }
 
       public DateTime Start { get; set; }
+
       public DateTime Slut { get; set; }
 
       public MDH.DriftavbrottKlient.DriftavbrottStatus Status { get; set; }
@@ -304,6 +304,4 @@ namespace SE.MDH.DriftavbrottKlient
 
     #endregion
   }
-
-  
 }
