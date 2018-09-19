@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading;
 using SE.MDH.DriftavbrottKlient.Model;
@@ -207,7 +208,18 @@ namespace SE.MDH.DriftavbrottKlient
         {
           string[] kanaler = kanalStatus.Keys.ToArray();
           List<driftavbrottType> kommandeAvbrott = new List<driftavbrottType>();
-          kommandeAvbrott.AddRange(client.GetPagaendeDriftavbrott(kanaler));
+          try
+          {
+            kommandeAvbrott.AddRange(client.GetPagaendeDriftavbrott(kanaler));
+          }
+          catch (Exception e)
+          {
+            if(e.InnerException != null && e.InnerException.Message.Equals("File Not Found"))
+            {
+              throw new ConfigurationErrorsException("Felaktig konfiguration.");
+            }
+            throw;
+          }
           
           foreach (driftavbrottType avbrott in kommandeAvbrott)
           {

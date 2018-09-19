@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Web;
 
 // Interna beroenden
 using SE.MDH.DriftavbrottKlient.Configuration;
@@ -154,7 +155,7 @@ namespace SE.MDH.DriftavbrottKlient
         // Servern returnerade 404 eller 406 (HTTP Statuskod=404)
         if (restResponse.StatusCode == HttpStatusCode.NotFound)
         {
-          throw new ApplicationException($"#Ett fel inträffade. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
+          throw new ApplicationException($"#Ett fel inträffade. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.", new HttpException(404, "File Not Found"));
         }
 
         // Servern returnerade inga driftavbrott alls (HTTP Statuskod=204, innehåll saknas)
@@ -166,12 +167,11 @@ namespace SE.MDH.DriftavbrottKlient
         // Servern returnerade eventuella driftavbrott (HTTP Statuskod=200)
         if (restResponse.StatusCode == HttpStatusCode.OK)
         {
+          // Data saknas, inga driftavbrott finns
           if (restResponse.Data == null)
           {
             return Enumerable.Empty<driftavbrottType>();
           }
-
-          // Data saknas, inga driftavbrott finns
           return new[] { restResponse.Data };
         }
 
