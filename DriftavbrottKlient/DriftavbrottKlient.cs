@@ -37,13 +37,23 @@ namespace SE.MDH.DriftavbrottKlient
 
     #region privata medlemmar
 
+    /// <summary>
+    /// Senaste svaret från driftavbrotttjänsten.
+    /// </summary>
+    private IEnumerable<driftavbrottType> gällandeSvarFrånDriftavbrott = new List<driftavbrottType>();
+
+    /// <summary>
+    /// Tidpunkten för senaste lyckade frågan till driftavbrottstjänsten.
+    /// </summary>
+    private DateTime senastFråganTillDriftavbrott = DateTime.Now.AddMinutes(-1);
+
     /// <summary>Server som används</summary>
     private string myServer;
     /// <summary>Port som används</summary>
     private int myPort;
     /// <summary>SystemId som används</summary>
     private string mySystemId;
-
+    /// <summary> Använd ssl. </summary>
     private bool myHttps;
 
     #endregion
@@ -108,79 +118,87 @@ namespace SE.MDH.DriftavbrottKlient
     /// <exception cref="ApplicationException"></exception>
     public IEnumerable<driftavbrottType> GetPagaendeDriftavbrott(IEnumerable<String> kanaler)
     {
-      // Använder ett tredjeparts-lib för att snyggt bygga en URI
-      FluentUriBuilder builder = FluentUriBuilder.Create()
+      if (senastFråganTillDriftavbrott < DateTime.Now)
+      {
+        #region Bygg frågan och klient
+
+        // Använder ett tredjeparts-lib för att snyggt bygga en URI
+        FluentUriBuilder builder = FluentUriBuilder.Create()
           .Scheme(myHttps ? UriScheme.Https : UriScheme.Http)
           .Host(myServer)
           .Port(myPort)
           .Path(BASE_URI + PÅGÅENDE_PATH);
 
-      foreach (var kanal in kanaler)
-      {
-        builder = builder.QueryParam(KANAL_PARAM, kanal);
-      }
-
-      // Släng in systemId som parameter till tjänsten, som alltid är ett krav
-      builder = builder.QueryParam(SYSTEM_PARAM, mySystemId);
-
-      // REST client
-      RestClient restClient = new RestClient
-      {
-        // BaseUrl (REST Service EndPoint adress)
-        BaseUrl = builder.ToUri(),
-        Encoding = Encoding.UTF8
-      };
-
-      // Request som skickas
-      RestRequest restRequest = new RestRequest
-      {
-        // Metod (POST, GET, PUT, DELETE)
-        // RequestFormat (XML, JSON)
-        Method = Method.GET,
-        RequestFormat = DataFormat.Xml
-      };
-
-      // Lägg till Header (endast XML accepteras)
-      restRequest.AddHeader("Accept", "application/xml,application/json");
-
-      // Gör anropet
-      IRestResponse<driftavbrottType> restResponse = restClient.Execute<driftavbrottType>(restRequest);
-
-      // Fick vi något svar alls?
-      if(restResponse !=null)
-      {
-        // Hämta HTTP statuskoden i numerisk form (ex: 200)
-        Int32 numericStatusCode = (Int32) restResponse.StatusCode;
-
-        // Servern returnerade 404 eller 406 (HTTP Statuskod=404)
-        if (restResponse.StatusCode == HttpStatusCode.NotFound)
+        foreach (var kanal in kanaler)
         {
-          throw new ApplicationException($"#Ett fel inträffade. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.", new HttpException(404, "File Not Found"));
+          builder = builder.QueryParam(KANAL_PARAM, kanal);
         }
 
-        // Servern returnerade inga driftavbrott alls (HTTP Statuskod=204, innehåll saknas)
-        if (restResponse.StatusCode == HttpStatusCode.NoContent)
-        {
-          return Enumerable.Empty<driftavbrottType>();
-        }
+        // Släng in systemId som parameter till tjänsten, som alltid är ett krav
+        builder = builder.QueryParam(SYSTEM_PARAM, mySystemId);
 
-        // Servern returnerade eventuella driftavbrott (HTTP Statuskod=200)
-        if (restResponse.StatusCode == HttpStatusCode.OK)
+        // REST client
+        RestClient restClient = new RestClient
         {
-          // Data saknas, inga driftavbrott finns
-          if (restResponse.Data == null)
+          // BaseUrl (REST Service EndPoint adress)
+          BaseUrl = builder.ToUri(),
+          Encoding = Encoding.UTF8
+        };
+
+        // Request som skickas
+        RestRequest restRequest = new RestRequest
+        {
+          // Metod (POST, GET, PUT, DELETE)
+          // RequestFormat (XML, JSON)
+          Method = Method.GET,
+          RequestFormat = DataFormat.Xml
+        };
+
+        // Lägg till Header (endast XML accepteras)
+        restRequest.AddHeader("Accept", "application/xml,application/json");
+
+        #endregion
+
+        // Gör anropet
+        IRestResponse<driftavbrottType> restResponse = restClient.Execute<driftavbrottType>(restRequest);
+
+        // Fick vi något svar alls?
+        if (restResponse != null)
+        {
+          // Sätter tidpunkten för senaste frågan.
+          senastFråganTillDriftavbrott = DateTime.Now.AddMinutes(1);
+
+          // Hämta HTTP statuskoden i numerisk form (ex: 200)
+          Int32 numericStatusCode = (Int32)restResponse.StatusCode;
+
+          // Servern returnerade 404 eller 406 (HTTP Statuskod=404)
+          if (restResponse.StatusCode == HttpStatusCode.NotFound)
           {
-            return Enumerable.Empty<driftavbrottType>();
+            throw new ApplicationException($"#Driftavbrottstjänsten returnerade 404/406. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.", new HttpException(404, "File Not Found"));
           }
-          return new[] { restResponse.Data };
+
+          // Servern returnerade inga driftavbrott alls (HTTP Statuskod=204, innehåll saknas)
+          if (restResponse.StatusCode == HttpStatusCode.NoContent)
+          {
+            gällandeSvarFrånDriftavbrott = Enumerable.Empty<driftavbrottType>();
+            return gällandeSvarFrånDriftavbrott;
+          }
+          // Servern returnerade eventuella driftavbrott (HTTP Statuskod=200)
+          if (restResponse.StatusCode == HttpStatusCode.OK)
+          {
+            // Sätter gällande svar till svar eller tomt om vi inte fick någon data.
+            gällandeSvarFrånDriftavbrott = restResponse.Data == null ? Enumerable.Empty<driftavbrottType>() : new[] { restResponse.Data };
+            return gällandeSvarFrånDriftavbrott;
+          }
+          // Servern returnerade någon form av annan statuskod som ej behandlas specifikt
+          throw new ApplicationException($"#Driftavbrottstjänsten returnerade en oväntad statuskod. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
         }
 
-        // Servern returnerade någon form av annan statuskod som ej behandlas specifikt
-        throw new ApplicationException($"#Ett fel inträffade. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
+        // Servern returnerade inget svar (Response) alls
+        throw new ApplicationException($"#Fick inget svar från driftavbrottstjänsten. RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
       }
-
-      // Servern returnerade inget svar (Response) alls
-      throw new ApplicationException($"#Ett oväntat fel inträffade. Inget svar finns att behandla. RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
+      // returnerar senaste svaret.
+      return gällandeSvarFrånDriftavbrott;
     }
 
     #endregion

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Threading;
 using SE.MDH.DriftavbrottKlient.Model;
@@ -29,9 +28,19 @@ namespace SE.MDH.DriftavbrottKlient
     /// <param name="args"></param>
     public delegate void DriftavbrottStatusHandler(object sender, DriftavbrottStatusEvent args);
     /// <summary>
-    /// Event
+    /// Status event
     /// </summary>
     public event DriftavbrottStatusHandler DriftavbrottStatus;
+    /// <summary>
+    /// Händelsedelegat
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="args"></param>
+    public delegate void ErrorOccurredHandler(object sender, ErrorEvent args);
+    /// <summary>
+    /// Error event
+    /// </summary>
+    public event ErrorOccurredHandler ErrorOccurred;
 
     #endregion
 
@@ -53,7 +62,8 @@ namespace SE.MDH.DriftavbrottKlient
     public DriftavbrottMonitor(IEnumerable<string> kanaler)
     {
       workerClass = new BgWorker(new DriftavbrottKlient(), kanaler);
-      workerClass.DriftavbrottStatus += WorkerClass_DriftavbrottStatus;
+      workerClass.DriftavbrottStatus += workerClassDriftavbrottStatus;
+      workerClass.ErrorOccurred += workerClassOnErrorOccurred;
       workerThread = new Thread(workerClass.Start);
       workerThread.Start();
       while (workerThread.IsAlive != true) { }
@@ -70,7 +80,8 @@ namespace SE.MDH.DriftavbrottKlient
     public DriftavbrottMonitor(IEnumerable<string> kanaler, string server, int port, string systemid, bool https = false)
     {
       workerClass = new BgWorker(new DriftavbrottKlient(server, port, systemid, https), kanaler);
-      workerClass.DriftavbrottStatus += WorkerClass_DriftavbrottStatus;
+      workerClass.DriftavbrottStatus += workerClassDriftavbrottStatus;
+      workerClass.ErrorOccurred += workerClassOnErrorOccurred;
       workerThread = new Thread(workerClass.Start);
       workerThread.Start();
       while (workerThread.IsAlive != true) { }
@@ -80,12 +91,19 @@ namespace SE.MDH.DriftavbrottKlient
 
     #region privata metoder
 
-    /// <summary>/// Hanterar event/// </summary>
+    /// <summary>Hanterar status event</summary>
     /// <param name="sender">Avsändare</param>
-    /// <param name="args"DriftavbrottStatusEvent></param>
-    private void WorkerClass_DriftavbrottStatus(object sender, DriftavbrottStatusEvent args)
+    /// <param name="args"DriftavbrottStatusEvent>Statusargument</param>
+    private void workerClassDriftavbrottStatus(object sender, DriftavbrottStatusEvent args)
     {
       DriftavbrottStatus?.Invoke(this, args);
+    }
+    /// <summary>Hanterar error event</summary>
+    /// <param name="sender">Avsändare</param>
+    /// <param name="args">Errorargument</param>
+    private void workerClassOnErrorOccurred(object sender, ErrorEvent args)
+    {
+      ErrorOccurred?.Invoke(this, args);
     }
 
     #endregion
@@ -112,7 +130,8 @@ namespace SE.MDH.DriftavbrottKlient
         Disposed = true;
         workerClass.RequestStop();
         workerThread.Join(1000);
-        workerClass.DriftavbrottStatus -= WorkerClass_DriftavbrottStatus;
+        workerClass.DriftavbrottStatus -= workerClassDriftavbrottStatus;
+        workerClass.ErrorOccurred -= workerClassOnErrorOccurred;
       }
     }
 
@@ -149,6 +168,16 @@ namespace SE.MDH.DriftavbrottKlient
       /// Event
       /// </summary>
       internal event DriftavbrottStatusHandler DriftavbrottStatus;
+      /// <summary>
+      /// Händelsedelegat
+      /// </summary>
+      /// <param name="sender"></param>
+      /// <param name="args"></param>
+      public delegate void ErrorOccurredHandler(object sender, ErrorEvent args);
+      /// <summary>
+      /// Error event
+      /// </summary>
+      public event ErrorOccurredHandler ErrorOccurred;
 
       #endregion
 
@@ -191,12 +220,21 @@ namespace SE.MDH.DriftavbrottKlient
       #region privata metoder
 
       /// <summary>
-      /// Etablerar händelse.
+      /// Etablerar händelse vid statusförändringar.
       /// </summary>
       /// <param name="evnt">DriftavbrottStatusEvent</param>
-      private void OnDriftavbrottStatusChanged(DriftavbrottStatusEvent evnt)
+      private void onDriftavbrottStatusChanged(DriftavbrottStatusEvent evnt)
       {
         DriftavbrottStatus?.Invoke(this, evnt);
+      }
+
+      /// <summary>
+      /// Etablerar händelse vid fel.
+      /// </summary>
+      /// <param name="evnt">ErrorEvent</param>
+      private void onErrorOccurred(ErrorEvent evnt)
+      {
+        ErrorOccurred?.Invoke(this, evnt);
       }
 
       /// <summary>
@@ -208,17 +246,21 @@ namespace SE.MDH.DriftavbrottKlient
         {
           string[] kanaler = kanalStatus.Keys.ToArray();
           List<driftavbrottType> kommandeAvbrott = new List<driftavbrottType>();
+          
           try
           {
             kommandeAvbrott.AddRange(client.GetPagaendeDriftavbrott(kanaler));
           }
           catch (Exception e)
           {
-            if(e.InnerException != null && e.InnerException.Message.Equals("File Not Found"))
+            if (e.InnerException != null && e.InnerException.Message.Equals("File Not Found"))
             {
-              throw new ConfigurationErrorsException("Felaktig konfiguration.");
+              onErrorOccurred(new ErrorEvent("Ett eventueltt konfigurationsfel inträffade.", ErrorEvent.ErrorNivå.Warn, e));
             }
-            throw;
+            else
+            {
+              throw;
+            }
           }
           
           foreach (driftavbrottType avbrott in kommandeAvbrott)
@@ -230,7 +272,7 @@ namespace SE.MDH.DriftavbrottKlient
                 kanalStatus[avbrott.kanal].Status = MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående;
                 kanalStatus[avbrott.kanal].Start = avbrott.start;
                 kanalStatus[avbrott.kanal].Slut = avbrott.slut;
-                OnDriftavbrottStatusChanged(
+                onDriftavbrottStatusChanged(
                   new DriftavbrottStatusEvent(
                   MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående,
                   avbrott.kanal,
@@ -261,7 +303,7 @@ namespace SE.MDH.DriftavbrottKlient
               if (kanal.Value.Status == MDH.DriftavbrottKlient.DriftavbrottStatus.Pågående)
               {
                 kanal.Value.Status = MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört;
-                OnDriftavbrottStatusChanged(
+                onDriftavbrottStatusChanged(
                   new DriftavbrottStatusEvent(
                     MDH.DriftavbrottKlient.DriftavbrottStatus.Upphört,
                     kanal.Value.Name,
@@ -275,7 +317,7 @@ namespace SE.MDH.DriftavbrottKlient
 
           if (shouldStop == false)
           {
-            for (int i = 0; i < 20; i++)
+            for (int i = 0; i < 120; i++)
             {
               Thread.Sleep(500);
               if (shouldStop)
