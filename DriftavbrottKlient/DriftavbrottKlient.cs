@@ -165,33 +165,37 @@ namespace SE.MDH.DriftavbrottKlient
         // Fick vi något svar alls?
         if (restResponse != null)
         {
-          // Sätter tidpunkten för senaste frågan.
-          senastFråganTillDriftavbrott = DateTime.Now.AddMinutes(1);
-
-          // Hämta HTTP statuskoden i numerisk form (ex: 200)
-          Int32 numericStatusCode = (Int32)restResponse.StatusCode;
-
-          // Servern returnerade 404 eller 406 (HTTP Statuskod=404)
-          if (restResponse.StatusCode == HttpStatusCode.NotFound)
+          if (restResponse.IsSuccessful)
           {
-            throw new ApplicationException($"#Driftavbrottstjänsten returnerade 404/406. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.", new HttpException(404, "File Not Found"));
-          }
+            // Sätter tidpunkten för senaste frågan.
+            senastFråganTillDriftavbrott = DateTime.Now.AddMinutes(1);
 
-          // Servern returnerade inga driftavbrott alls (HTTP Statuskod=204, innehåll saknas)
-          if (restResponse.StatusCode == HttpStatusCode.NoContent)
-          {
-            gällandeSvarFrånDriftavbrott = Enumerable.Empty<driftavbrottType>();
-            return gällandeSvarFrånDriftavbrott;
+            // Hämta HTTP statuskoden i numerisk form (ex: 200)
+            Int32 numericStatusCode = (Int32)restResponse.StatusCode;
+
+            // Servern returnerade 404 eller 406 (HTTP Statuskod=404)
+            if (restResponse.StatusCode == HttpStatusCode.NotFound)
+            {
+              throw new ApplicationException($"#Driftavbrottstjänsten returnerade 404/406. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.", new HttpException(404, "File Not Found"));
+            }
+
+            // Servern returnerade inga driftavbrott alls (HTTP Statuskod=204, innehåll saknas)
+            if (restResponse.StatusCode == HttpStatusCode.NoContent)
+            {
+              gällandeSvarFrånDriftavbrott = Enumerable.Empty<driftavbrottType>();
+              return gällandeSvarFrånDriftavbrott;
+            }
+            // Servern returnerade eventuella driftavbrott (HTTP Statuskod=200)
+            if (restResponse.StatusCode == HttpStatusCode.OK)
+            {
+              // Sätter gällande svar till svar eller tomt om vi inte fick någon data.
+              gällandeSvarFrånDriftavbrott = restResponse.Data == null ? Enumerable.Empty<driftavbrottType>() : new[] { restResponse.Data };
+              return gällandeSvarFrånDriftavbrott;
+            }
+            // Servern returnerade någon form av annan statuskod som ej behandlas specifikt
+            throw new ApplicationException($"#Driftavbrottstjänsten returnerade en oväntad statuskod. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
           }
-          // Servern returnerade eventuella driftavbrott (HTTP Statuskod=200)
-          if (restResponse.StatusCode == HttpStatusCode.OK)
-          {
-            // Sätter gällande svar till svar eller tomt om vi inte fick någon data.
-            gällandeSvarFrånDriftavbrott = restResponse.Data == null ? Enumerable.Empty<driftavbrottType>() : new[] { restResponse.Data };
-            return gällandeSvarFrånDriftavbrott;
-          }
-          // Servern returnerade någon form av annan statuskod som ej behandlas specifikt
-          throw new ApplicationException($"#Driftavbrottstjänsten returnerade en oväntad statuskod. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
+          throw new ApplicationException($"Driftavbrottstjänsten svarar inte. ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
         }
 
         // Servern returnerade inget svar (Response) alls

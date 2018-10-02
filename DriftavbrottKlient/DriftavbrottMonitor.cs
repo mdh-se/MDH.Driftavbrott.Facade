@@ -246,10 +246,14 @@ namespace SE.MDH.DriftavbrottKlient
         {
           string[] kanaler = kanalStatus.Keys.ToArray();
           List<driftavbrottType> kommandeAvbrott = new List<driftavbrottType>();
-          
+
           try
           {
             kommandeAvbrott.AddRange(client.GetPagaendeDriftavbrott(kanaler));
+          }
+          catch (ApplicationException e)
+          {
+            onErrorOccurred(new ErrorEvent(e.Message, ErrorEvent.ErrorNivå.Warn, e));
           }
           catch (Exception e)
           {
