@@ -19,8 +19,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="se.mdh.driftavbrottklient.dll" target="lib\net45\" />
-    <file src="se.mdh.driftavbrottklient.pdb" target="lib\net45\" />
-    <file src="se.mdh.driftavbrottklient.xml" target="lib\net45\" />
+    <file src="se.mdh.driftavbrottklient.dll" target="lib\net471\" />
+    <file src="se.mdh.driftavbrottklient.pdb" target="lib\net471\" />
+    <file src="se.mdh.driftavbrottklient.xml" target="lib\net471\" />
   </files>
 </package>
