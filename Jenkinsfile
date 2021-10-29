@@ -1,1 +1,1 @@
-buildNuGetPackage()
+buildNuGetPackage(runUnitTests: false)
