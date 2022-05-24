@@ -7,7 +7,7 @@
     <ProjectGuid>{4991C8CF-65D0-47B6-9FFE-2DC158A8C66A}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>DriftavbrottMonitorTest</RootNamespace>
-    <AssemblyName>DriftavbrottMonitorTest</AssemblyName>
+    <AssemblyName>MDH.DriftavbrottKlient.MonitorTest</AssemblyName>
     <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -101,9 +101,9 @@
     <None Include="Resources\Red.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DriftavbrottKlient\DriftavbrottKlient.csproj">
+    <ProjectReference Include="..\MDH.DriftavbrottKlient\MDH.DriftavbrottKlient.csproj">
       <Project>{9b8c9883-50ca-4175-b156-b0ad75c65e62}</Project>
-      <Name>DriftavbrottKlient</Name>
+      <Name>MDH.DriftavbrottKlient</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
