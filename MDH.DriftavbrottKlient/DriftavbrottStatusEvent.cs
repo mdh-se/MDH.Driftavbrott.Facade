@@ -29,6 +29,8 @@ namespace SE.MDH.DriftavbrottKlient
     /// </summary>
     /// <param name="status">Status</param>
     /// <param name="kanal">Kanal</param>
+    /// <param name="meddelandeSv">Meddelandet på svenska</param>
+    /// <param name="meddelandeEng">Meddelandet på engelska</param>
     public DriftavbrottStatusEvent(DriftavbrottStatus status, string kanal, string meddelandeSv, string meddelandeEng)
     {
       Kanal = kanal;

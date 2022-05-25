@@ -93,7 +93,7 @@ namespace SE.MDH.DriftavbrottKlient
 
     /// <summary>Hanterar status event</summary>
     /// <param name="sender">Avsändare</param>
-    /// <param name="args"DriftavbrottStatusEvent>Statusargument</param>
+    /// <param name="args">Statusargument</param>
     private void workerClassDriftavbrottStatus(object sender, DriftavbrottStatusEvent args)
     {
       DriftavbrottStatus?.Invoke(this, args);
