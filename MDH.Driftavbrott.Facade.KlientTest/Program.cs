@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SE.MDH.DriftavbrottKlient;
-using SE.MDH.DriftavbrottKlient.Model;
+using SE.MDH.Driftavbrott.Modell;
 
 namespace DriftavbrottKlientTest
 {

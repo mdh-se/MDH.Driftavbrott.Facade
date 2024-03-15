@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using SE.MDH.DriftavbrottKlient.Model;
+using SE.MDH.Driftavbrott.Modell;
 
 namespace SE.MDH.DriftavbrottKlient
 {

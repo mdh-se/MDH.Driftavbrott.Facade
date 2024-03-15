@@ -10,7 +10,7 @@ using System.Web;
 
 // Interna beroenden
 using SE.MDH.DriftavbrottKlient.Configuration;
-using SE.MDH.DriftavbrottKlient.Model;
+using SE.MDH.Driftavbrott.Modell;
 
 // Externa beroenden
 using FluentUri;
