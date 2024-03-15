@@ -70,18 +70,18 @@ namespace DriftavbrottKlientTest
       {
         Console.WriteLine("Parameter saknas.");
         Console.WriteLine("Ange server och port");
-        Console.WriteLine("Ex: MDH.DriftavbrottKlient.KlientTest.exe server.domain 2345");
+        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.KlientTest.exe server.domain 2345");
         Console.WriteLine("Eller ange noconfig för att använda konfiguration från app.config filen.");
-        Console.WriteLine("Ex: MDH.DriftavbrottKlient.KlientTest.exe noconfig");
+        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.KlientTest.exe noconfig");
         Environment.Exit(-1);
       }
       if (string.IsNullOrEmpty(args[0]) | string.IsNullOrEmpty(args[1]))
       {
         Console.WriteLine("Parameter saknas.");
         Console.WriteLine("Ange server och port");
-        Console.WriteLine("Ex: MDH.DriftavbrottKlient.KlientTest.exe server.domain 2345");
+        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.KlientTest.exe server.domain 2345");
         Console.WriteLine("Eller ange noconfig för att använda konfiguration från app.config filen.");
-        Console.WriteLine("Ex: MDH.DriftavbrottKlient.KlientTest.exe noconfig");
+        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.KlientTest.exe noconfig");
         Environment.Exit(-1);
       }
       int port;
@@ -89,7 +89,7 @@ namespace DriftavbrottKlientTest
       {
         Console.WriteLine("Felaktig parameter.");
         Console.WriteLine("Ange server och port");
-        Console.WriteLine("Ex: MDH.DriftavbrottKlient.KlientTest.exe server.domain 2345");
+        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.KlientTest.exe server.domain 2345");
         Environment.Exit(-1);
       }
       return new DriftavbrottKlient(args[0], port, "DriftavbrottKlient-Test");
