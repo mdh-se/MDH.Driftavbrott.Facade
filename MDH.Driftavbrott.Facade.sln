@@ -5,14 +5,14 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDH.Driftavbrott.Facade", "MDH.Driftavbrott.Facade\MDH.Driftavbrott.Facade.csproj", "{9B8C9883-50CA-4175-B156-B0AD75C65E62}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDH.Driftavbrott.Facade.KlientTest", "MDH.Driftavbrott.Facade.KlientTest\MDH.Driftavbrott.Facade.KlientTest.csproj", "{88E4CE26-55CA-4FB4-B52C-9127F2991371}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDH.Driftavbrott.Facade.Klient.Demo", "MDH.Driftavbrott.Facade.Klient.Demo\MDH.Driftavbrott.Facade.Klient.Demo.csproj", "{88E4CE26-55CA-4FB4-B52C-9127F2991371}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FCFB3209-4CAD-48E7-9506-77198334AC36}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDH.Driftavbrott.Facade.MonitorTest", "MDH.Driftavbrott.Facade.MonitorTest\MDH.Driftavbrott.Facade.MonitorTest.csproj", "{4991C8CF-65D0-47B6-9FFE-2DC158A8C66A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDH.Driftavbrott.Facade.Monitor.Demo", "MDH.Driftavbrott.Facade.Monitor.Demo\MDH.Driftavbrott.Facade.Monitor.Demo.csproj", "{4991C8CF-65D0-47B6-9FFE-2DC158A8C66A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
