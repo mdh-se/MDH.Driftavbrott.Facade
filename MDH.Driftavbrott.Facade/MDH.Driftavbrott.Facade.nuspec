@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>SE.MDH.DriftavbrottKlient</id>
+    <id>SE.MDH.Driftavbrott.Facade</id>
     <version>1.0.0.0</version>
-    <title>SE.MDH.DriftavbrottKlient</title>
+    <title>SE.MDH.Driftavbrott.Facade</title>
     <authors>Lars Lindqvist, Robert Isaksson, Daniel Blomberg</authors>
     <owners>Malardalens University</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -19,8 +19,8 @@
     </dependencies>
   </metadata>
   <files>
-    <file src="MDH.DriftavbrottKlient.dll" target="lib\net471\" />
-    <file src="MDH.DriftavbrottKlient.pdb" target="lib\net471\" />
-    <file src="MDH.DriftavbrottKlient.xml" target="lib\net471\" />
+    <file src="MDH.Driftavbrott.Facade.dll" target="lib\net471\" />
+    <file src="MDH.Driftavbrott.Facade.pdb" target="lib\net471\" />
+    <file src="MDH.Driftavbrott.Facade.xml" target="lib\net471\" />
   </files>
 </package>
