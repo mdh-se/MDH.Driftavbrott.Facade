@@ -1,6 +1,6 @@
-﻿# MDH.DriftavbrottKlient
+﻿# MDH.Driftavbrott.Facade
 
-En .NET-klient som kan kommunicera med mdh-driftavbrott-service.
+En .NET-facade som kan kommunicera med mdh-driftavbrott-service.
 
 ## Användning, konfiguration i appconfig
 
