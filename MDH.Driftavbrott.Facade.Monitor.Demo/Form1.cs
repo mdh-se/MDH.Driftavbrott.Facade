@@ -10,7 +10,7 @@ namespace DriftavbrottMonitorTest
     public Form1()
     {
       InitializeComponent();
-      monitor = new DriftavbrottMonitor(new [] { "ladok.uppgradering", "ladok.backup" });
+      monitor = new DriftavbrottMonitor(new [] { "ladok.uppgradering", "ladok.backup" }, "DriftavbrottKlient-Test");
       monitor.DriftavbrottStatus += Monitor_DriftavbrottStatus;
     }
 

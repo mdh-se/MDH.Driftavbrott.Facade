@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using SE.MDH.DriftavbrottKlient;
 using SE.MDH.Driftavbrott.Modell;
 
@@ -24,7 +25,7 @@ namespace DriftavbrottKlientTest
 
       try
       {
-        IEnumerable<driftavbrottType> driftavbrott = driftavbrottKlient.GetPagaendeDriftavbrott(new[] { "alltid" });
+        IEnumerable<driftavbrottType> driftavbrott = driftavbrottKlient.GetPagaendeDriftavbrott(new[] { "alltid" }, "DriftavbrottKlient-Test");
         foreach (driftavbrottType driftavbrottType in driftavbrott)
         {
           Console.WriteLine($"[kanal={driftavbrottType.kanal}, start={driftavbrottType.start}, slut={driftavbrottType.slut}]");
@@ -59,40 +60,35 @@ namespace DriftavbrottKlientTest
 
     private static DriftavbrottKlient GetDriftavbrottKlient(string[] args)
     {
-      if (args.Length == 1)
+      if (args.Length == 0)
       {
-        if (args[0].ToLower().Equals("noconfig"))
-        {
           return new DriftavbrottKlient();
+      }
+
+      NameValueCollection config = new NameValueCollection();
+      if (args.Length > 0)
+      {
+        foreach (var argument in args)
+        {
+          // leta efter url bland argumenten
+          if (argument.ToLower().StartsWith("url="))
+          {
+            config["url"] = argument.Substring(4);
+          }
         }
       }
-      if (args.Length < 2)
+
+      if (config.Count < 1)
       {
-        Console.WriteLine("Parameter saknas.");
-        Console.WriteLine("Ange server och port");
-        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.Klient.Demo.exe server.domain 2345");
-        Console.WriteLine("Eller ange noconfig för att använda konfiguration från app.config filen.");
-        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.Klient.Demo.exe noconfig");
+        Console.WriteLine("Korrekt parameter saknas.");
+        Console.WriteLine("Ange url som parameter");
+        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.Klient.Demo.exe url=https://localhost.mdu.se:3301/mdh-driftavbrott/v1");
+        Console.WriteLine("Eller ange inga argument för att använda konfiguration från app.config filen.");
+        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.Klient.Demo.exe");
         Environment.Exit(-1);
       }
-      if (string.IsNullOrEmpty(args[0]) | string.IsNullOrEmpty(args[1]))
-      {
-        Console.WriteLine("Parameter saknas.");
-        Console.WriteLine("Ange server och port");
-        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.Klient.Demo.exe server.domain 2345");
-        Console.WriteLine("Eller ange noconfig för att använda konfiguration från app.config filen.");
-        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.Klient.Demo.exe noconfig");
-        Environment.Exit(-1);
-      }
-      int port;
-      if (!Int32.TryParse(args[1], out port))
-      {
-        Console.WriteLine("Felaktig parameter.");
-        Console.WriteLine("Ange server och port");
-        Console.WriteLine("Ex: MDH.Driftavbrott.Facade.Klient.Demo.exe server.domain 2345");
-        Environment.Exit(-1);
-      }
-      return new DriftavbrottKlient(args[0], port, "DriftavbrottKlient-Test");
+      
+      return new DriftavbrottKlient(config);
     }
   }
 }

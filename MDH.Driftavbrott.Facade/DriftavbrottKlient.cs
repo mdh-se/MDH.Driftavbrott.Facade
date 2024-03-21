@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
 using System.Net;
@@ -13,7 +14,6 @@ using SE.MDH.DriftavbrottKlient.Configuration;
 using SE.MDH.Driftavbrott.Modell;
 
 // Externa beroenden
-using FluentUri;
 using RestSharp;
 
 #endregion
@@ -24,9 +24,6 @@ namespace SE.MDH.DriftavbrottKlient
   public class DriftavbrottKlient : IDisposable
   {
     #region Privata konstanter
-
-    // Konstant för bas uri
-    private const string BASE_URI = "mdh-driftavbrott/v1";
 
     // Konstanter mot REST-resurser och queryparametrar
     private const string PÅGÅENDE_PATH= "/driftavbrott/pagaende";
@@ -47,14 +44,8 @@ namespace SE.MDH.DriftavbrottKlient
     /// </summary>
     private DateTime senastFråganTillDriftavbrott = DateTime.Now.AddMinutes(-1);
 
-    /// <summary>Server som används</summary>
-    private string myServer;
-    /// <summary>Port som används</summary>
-    private int myPort;
-    /// <summary>SystemId som används</summary>
-    private string mySystemId;
-    /// <summary> Använd ssl. </summary>
-    private bool myHttps;
+    /// <summary>Url till den service som används</summary>
+    private string myServiceUrl;
 
     #endregion
 
@@ -65,44 +56,36 @@ namespace SE.MDH.DriftavbrottKlient
 
     #endregion
 
-    #region Kontruktor
+    #region Konstruktor
 
-    /// <summary>Kontruktor som används om man anger konfigurationen i App.Config</summary>
+    /// <summary>Konstruktor som används om man anger konfigurationen i App.Config</summary>
     /// <exception cref="ConfigurationErrorsException"></exception>
     public DriftavbrottKlient()
     {
       try
       {
-        myServer = CurrentConfiguration.Server;
-        myPort = CurrentConfiguration.Port;
-        mySystemId = CurrentConfiguration.SystemId;
-        myHttps = CurrentConfiguration.Https;
+        myServiceUrl = CurrentConfiguration.Url;
       }
       catch (Exception e)
       {
         throw new ConfigurationErrorsException("Felaktig konfiguration.", e);
       }
     }
-    /// <summary>Kontruktor som används vid programatisk konfiguration.</summary>
-    /// <param name="server">Server</param>
-    /// <param name="port">Port</param>
-    /// <param name="systemid">Systemets namn</param>
-    /// <param name="https">Https</param>
-    /// <exception cref="ArgumentNullException"></exception>
-    public DriftavbrottKlient(string server, int port, string systemid, bool https = false)
+    /// <summary>
+    /// Konstruktor som används vid programatisk konfiguration.
+    /// </summary>
+    /// <param name="config">Samling med konfigurationsparametrar, måste innehålla "url".</param>
+    /// <exception cref="ConfigurationErrorsException">Kastas när det finns ett fel i konfigurationen.</exception>
+    public DriftavbrottKlient(NameValueCollection config)
     {
-      if (String.IsNullOrEmpty(server))
+      try
       {
-        throw new ArgumentNullException(nameof(server), "Server måste anges.");
+        myServiceUrl = config["url"];
       }
-      if (String.IsNullOrEmpty(systemid))
+      catch (Exception e)
       {
-        throw new ArgumentNullException(nameof(systemid), "SystemId måste anges.");
+        throw new ConfigurationErrorsException($"Felaktig konfiguration.", e);
       }
-      myServer = server;
-      myPort = port;
-      mySystemId = systemid;
-      myHttps = https;
     }
 
     #endregion
@@ -110,38 +93,34 @@ namespace SE.MDH.DriftavbrottKlient
     #region Publika metoder
 
     /// <summary>
-    /// Hämtar pågående driftavbrott på de kanaler som anges. Om något
-    /// annat fel inträffar kastas ett ApplicationException.
+    /// Hämtar pågående driftavbrott på de kanaler som anges. Om något annat fel inträffar kastas ett ApplicationException.
     /// </summary>
     /// <param name="kanaler">Samling kanaler vars driftavbrott ska hämtas</param>
+    /// <param name="system">Namnet på den anropande komponenten</param>
     /// <returns>Ska endast returnera noll eller ett driftavbrott i praktiken</returns>
     /// <exception cref="ApplicationException"></exception>
-    public IEnumerable<driftavbrottType> GetPagaendeDriftavbrott(IEnumerable<String> kanaler)
+    public IEnumerable<driftavbrottType> GetPagaendeDriftavbrott(IEnumerable<String> kanaler, String system)
     {
       if (senastFråganTillDriftavbrott < DateTime.Now)
       {
-        #region Bygg frågan och klient
-
-        // Använder ett tredjeparts-lib för att snyggt bygga en URI
-        FluentUriBuilder builder = FluentUriBuilder.Create()
-          .Scheme(myHttps ? UriScheme.Https : UriScheme.Http)
-          .Host(myServer)
-          .Port(myPort)
-          .Path(BASE_URI + PÅGÅENDE_PATH);
+        // Först bygger vi anropsparametrarna kanaler och systemId
+        NameValueCollection queryParameters = HttpUtility.ParseQueryString(string.Empty);
 
         foreach (var kanal in kanaler)
         {
-          builder = builder.QueryParam(KANAL_PARAM, kanal);
+          queryParameters[KANAL_PARAM] = kanal;
         }
-
-        // Släng in systemId som parameter till tjänsten, som alltid är ett krav
-        builder = builder.QueryParam(SYSTEM_PARAM, mySystemId);
-
+        
+        queryParameters[SYSTEM_PARAM] = system;
+        
+        // Nu bakar vi ihop hela sökvägen och alla parametrar
+        UriBuilder baseUri = new UriBuilder(myServiceUrl + PÅGÅENDE_PATH);
+        baseUri.Query = queryParameters.ToString();
+        
         // REST client
         RestClient restClient = new RestClient
         {
-          // BaseUrl (REST Service EndPoint adress)
-          BaseUrl = builder.ToUri(),
+          BaseUrl = baseUri.Uri,
           Encoding = Encoding.UTF8
         };
 
@@ -156,8 +135,6 @@ namespace SE.MDH.DriftavbrottKlient
 
         // Lägg till Header (endast XML accepteras)
         restRequest.AddHeader("Accept", "application/xml,application/json");
-
-        #endregion
 
         // Gör anropet
         IRestResponse<driftavbrottType> restResponse = restClient.Execute<driftavbrottType>(restRequest);

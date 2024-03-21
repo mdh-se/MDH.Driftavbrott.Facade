@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading;
 using SE.MDH.Driftavbrott.Modell;
@@ -59,9 +60,10 @@ namespace SE.MDH.DriftavbrottKlient
     /// Skapar instansen
     /// </summary>
     /// <param name="kanaler">Driftavbrottskanaler</param>
-    public DriftavbrottMonitor(IEnumerable<string> kanaler)
+    /// <param name="system">Namnet på den anropande komponenten</param>
+    public DriftavbrottMonitor(IEnumerable<string> kanaler, string system)
     {
-      workerClass = new BgWorker(new DriftavbrottKlient(), kanaler);
+      workerClass = new BgWorker(new DriftavbrottKlient(), kanaler, system);
       workerClass.DriftavbrottStatus += workerClassDriftavbrottStatus;
       workerClass.ErrorOccurred += workerClassOnErrorOccurred;
       workerThread = new Thread(workerClass.Start);
@@ -73,13 +75,11 @@ namespace SE.MDH.DriftavbrottKlient
     /// Skapar instansen
     /// </summary>
     /// <param name="kanaler">Driftavbrottskanaler</param>
-    /// <param name="server">Server</param>
-    /// <param name="port">Port</param>
-    /// <param name="systemid">Systemets namn</param>
-    /// <param name="https">Https</param>
-    public DriftavbrottMonitor(IEnumerable<string> kanaler, string server, int port, string systemid, bool https = false)
+    /// <param name="system">Namnet på den anropande komponenten</param>
+    /// <param name="config">Samling med konfigurationsparametrar, måste innehålla "url".</param>
+    public DriftavbrottMonitor(IEnumerable<string> kanaler, string system, NameValueCollection config)
     {
-      workerClass = new BgWorker(new DriftavbrottKlient(server, port, systemid, https), kanaler);
+      workerClass = new BgWorker(new DriftavbrottKlient(config), kanaler, system);
       workerClass.DriftavbrottStatus += workerClassDriftavbrottStatus;
       workerClass.ErrorOccurred += workerClassOnErrorOccurred;
       workerThread = new Thread(workerClass.Start);
@@ -146,6 +146,7 @@ namespace SE.MDH.DriftavbrottKlient
     {
       #region medlemmar
 
+      private string system;
       /// <summary>
       /// Driftavbrottsklient.
       /// </summary>
@@ -187,9 +188,11 @@ namespace SE.MDH.DriftavbrottKlient
       /// </summary>
       /// <param name="client">DriftavbrottKlient</param>
       /// <param name="kanaler"></param>
-      public BgWorker(DriftavbrottKlient client, IEnumerable<string> kanaler)
+      /// <param name="system">Namnet på den anropande komponenten</param>
+      public BgWorker(DriftavbrottKlient client, IEnumerable<string> kanaler, string system)
       {
         this.client = client;
+        this.system = system;
         foreach (string s in kanaler)
         {
           kanalStatus.Add(s, new Kanal(s));
@@ -249,7 +252,7 @@ namespace SE.MDH.DriftavbrottKlient
 
           try
           {
-            kommandeAvbrott.AddRange(client.GetPagaendeDriftavbrott(kanaler));
+            kommandeAvbrott.AddRange(client.GetPagaendeDriftavbrott(kanaler, system));
           }
           catch (ApplicationException e)
           {
