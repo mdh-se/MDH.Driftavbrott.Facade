@@ -52,6 +52,9 @@ namespace SE.MDH.DriftavbrottKlient
     /// </summary>
     public bool Disposed { get; private set; }
 
+    /// <summary>Url till den rest-api som används</summary>
+    public string Url => workerClass.Url;
+    
     #endregion
 
     #region konstruktor
@@ -179,6 +182,8 @@ namespace SE.MDH.DriftavbrottKlient
       /// Error event
       /// </summary>
       public event ErrorOccurredHandler ErrorOccurred;
+
+      internal string Url => client.Url;
 
       #endregion
 

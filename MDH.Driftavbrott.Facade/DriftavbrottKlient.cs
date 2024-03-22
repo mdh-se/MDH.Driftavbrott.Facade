@@ -54,6 +54,9 @@ namespace SE.MDH.DriftavbrottKlient
     /// <summary>Indikerar att instansen är skrotad</summary>
     public bool Disposed { get; private set; }
 
+    /// <summary>Url till den service som används, fast offentligt tillgänglig</summary>
+    public string Url => myServiceUrl;
+
     #endregion
 
     #region Konstruktor
