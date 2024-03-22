@@ -117,7 +117,9 @@ namespace SE.MDH.DriftavbrottKlient
         queryParameters[SYSTEM_PARAM] = system;
         
         // Nu bakar vi ihop hela sökvägen och alla parametrar
-        UriBuilder baseUri = new UriBuilder(myServiceUrl + PÅGÅENDE_PATH);
+        // sökvägen ska ha exakt en snedstreck mellan bassökvägen till tjänsten (myServiceUrl) och sökvägen till pågående-resuren (PÅGÅENDE_PATH)
+        UriBuilder baseUri = new UriBuilder(myServiceUrl.TrimEnd('/') + "/" + PÅGÅENDE_PATH.TrimStart('/'));
+        
         baseUri.Query = queryParameters.ToString();
         
         // REST client
