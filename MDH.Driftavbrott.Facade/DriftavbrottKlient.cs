@@ -107,21 +107,22 @@ namespace SE.MDH.DriftavbrottKlient
       if (senastFråganTillDriftavbrott < DateTime.Now)
       {
         // Först bygger vi anropsparametrarna kanaler och systemId
-        NameValueCollection queryParameters = HttpUtility.ParseQueryString(string.Empty);
+        StringBuilder queryParameters = new StringBuilder();
 
         foreach (var kanal in kanaler)
         {
-          queryParameters[KANAL_PARAM] = kanal;
+          queryParameters.Append($"{HttpUtility.UrlEncode(KANAL_PARAM)}={HttpUtility.UrlEncode(kanal)}&");
         }
-        
-        queryParameters[SYSTEM_PARAM] = system;
+
+        queryParameters.Append($"{HttpUtility.UrlEncode(SYSTEM_PARAM)}={HttpUtility.UrlEncode(system)}");
+
         
         // Nu bakar vi ihop hela sökvägen och alla parametrar
         // sökvägen ska ha exakt en snedstreck mellan bassökvägen till tjänsten (myServiceUrl) och sökvägen till pågående-resuren (PÅGÅENDE_PATH)
         UriBuilder baseUri = new UriBuilder(myServiceUrl.TrimEnd('/') + "/" + PÅGÅENDE_PATH.TrimStart('/'));
-        
-        baseUri.Query = queryParameters.ToString();
-        
+
+        baseUri.Query = queryParameters.ToString().TrimEnd('&');
+
         // REST client
         RestClient restClient = new RestClient
         {
