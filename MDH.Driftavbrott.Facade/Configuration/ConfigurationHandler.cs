@@ -9,11 +9,11 @@ namespace SE.MDH.DriftavbrottKlient.Configuration
   internal class ConfigurationHandler : ConfigurationSection
   {
     /// <summary>Url</summary>
-    [ConfigurationProperty("url", IsRequired = true)]
-    public string Url
+    [ConfigurationProperty("serviceUrl", IsRequired = true)]
+    public string ServiceUrl
     {
-      get => this["url"].ToString();
-      set => this["url"] = value;
+      get => this["serviceUrl"].ToString();
+      set => this["serviceUrl"] = value;
     }
   }
 }

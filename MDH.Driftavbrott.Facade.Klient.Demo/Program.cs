@@ -73,7 +73,7 @@ namespace DriftavbrottKlientTest
           // leta efter url bland argumenten
           if (argument.ToLower().StartsWith("url="))
           {
-            config["url"] = argument.Substring(4);
+            config["serviceUrl"] = argument.Substring(4);
           }
         }
       }

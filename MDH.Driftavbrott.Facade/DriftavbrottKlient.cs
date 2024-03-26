@@ -55,7 +55,7 @@ namespace SE.MDH.DriftavbrottKlient
     public bool Disposed { get; private set; }
 
     /// <summary>Url till den service som används, fast offentligt tillgänglig</summary>
-    public string Url => myServiceUrl;
+    public string ServiceUrl => myServiceUrl;
 
     #endregion
 
@@ -83,7 +83,7 @@ namespace SE.MDH.DriftavbrottKlient
     {
       try
       {
-        myServiceUrl = config["url"];
+        myServiceUrl = config["serviceUrl"];
       }
       catch (Exception e)
       {

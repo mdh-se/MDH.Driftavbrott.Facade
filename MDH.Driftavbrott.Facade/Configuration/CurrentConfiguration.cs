@@ -13,7 +13,7 @@ namespace SE.MDH.DriftavbrottKlient.Configuration
     #region Privata konstanter
 
     /// <summary>Sektion i konfigurationsfilen</summary>
-    private const string KONFIGURATIONS_SEKTION = "se.mdh.driftavbrott.service";
+    private const string KONFIGURATIONS_SEKTION = "se.mdh.driftavbrott.facade";
     #endregion
 
     #region privata medlemmar
@@ -25,7 +25,7 @@ namespace SE.MDH.DriftavbrottKlient.Configuration
 
     #region publika egenskaper
     /// <summary>Server</summary>
-    public static string Url => myConfiguration.Url;
+    public static string Url => myConfiguration.ServiceUrl;
 
     #endregion
 
