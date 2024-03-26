@@ -53,7 +53,7 @@ namespace SE.MDH.DriftavbrottKlient
     public bool Disposed { get; private set; }
 
     /// <summary>Url till den rest-api som används</summary>
-    public string Url => workerClass.ServiceUrl;
+    public string ServiceUrl => workerClass.ServiceUrl;
     
     #endregion
 

@@ -25,7 +25,7 @@ namespace SE.MDH.DriftavbrottKlient.Configuration
 
     #region publika egenskaper
     /// <summary>Server</summary>
-    public static string Url => myConfiguration.ServiceUrl;
+    public static string ServiceUrl => myConfiguration.ServiceUrl;
 
     #endregion
 

@@ -67,7 +67,7 @@ namespace SE.MDH.DriftavbrottKlient
     {
       try
       {
-        myServiceUrl = CurrentConfiguration.Url;
+        myServiceUrl = CurrentConfiguration.ServiceUrl;
       }
       catch (Exception e)
       {
