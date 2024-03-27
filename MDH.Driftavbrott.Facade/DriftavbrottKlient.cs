@@ -47,6 +47,15 @@ namespace SE.MDH.DriftavbrottKlient
     /// <summary>Url till den service som används</summary>
     private string myServiceUrl;
 
+    private RestClient _restClient;
+    private RestClient restClient
+    {
+      get
+      {
+        return _restClient ?? (_restClient = new RestClient(myServiceUrl));
+      }
+    }
+    
     #endregion
 
     #region Publika egenskaper
@@ -106,41 +115,21 @@ namespace SE.MDH.DriftavbrottKlient
     {
       if (senastFråganTillDriftavbrott < DateTime.Now)
       {
-        // Först bygger vi anropsparametrarna kanaler och systemId
-        StringBuilder queryParameters = new StringBuilder();
+        // Request som skickas
+        RestRequest restRequest = new RestRequest(PÅGÅENDE_PATH.TrimStart('/'), Method.Get);
+        restRequest.AddHeader("Accept", "application/xml,application/json");
+        restRequest.RequestFormat = DataFormat.Xml;
 
+        // lägg till parametrarna
         foreach (var kanal in kanaler)
         {
-          queryParameters.Append($"{HttpUtility.UrlEncode(KANAL_PARAM)}={HttpUtility.UrlEncode(kanal)}&");
+          restRequest.AddParameter(KANAL_PARAM, kanal);
         }
-
-        queryParameters.Append($"{HttpUtility.UrlEncode(SYSTEM_PARAM)}={HttpUtility.UrlEncode(system)}");
-
+        restRequest.AddParameter(SYSTEM_PARAM, system);
         
-        // Nu bakar vi ihop hela sökvägen och alla parametrar
-        // sökvägen ska ha exakt en snedstreck mellan bassökvägen till tjänsten (myServiceUrl) och sökvägen till pågående-resuren (PÅGÅENDE_PATH)
-        UriBuilder baseUri = new UriBuilder(myServiceUrl.TrimEnd('/') + "/" + PÅGÅENDE_PATH.TrimStart('/'));
-
-        baseUri.Query = queryParameters.ToString().TrimEnd('&');
-
-        // REST client
-        RestClient restClient = new RestClient(baseUri.Uri);
-
-        // Request som skickas
-        RestRequest restRequest = new RestRequest
-        {
-          // Metod (Get, Post, Put, Delete, Head, Options, Patch, Merge, Copy, Search)
-          // RequestFormat (Json, Xml, Binary, None)
-          Method = Method.Get,
-          RequestFormat = DataFormat.Xml
-        };
-
-        // Lägg till Header (endast XML accepteras)
-        restRequest.AddHeader("Accept", "application/xml,application/json");
-
         // Gör anropet
         RestResponse<driftavbrottType> restResponse = restClient.Execute<driftavbrottType>(restRequest);
-
+        
         // Fick vi något svar alls?
         if (restResponse != null)
         {
