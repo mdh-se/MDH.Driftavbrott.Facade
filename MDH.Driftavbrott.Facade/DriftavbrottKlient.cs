@@ -116,7 +116,7 @@ namespace SE.MDH.DriftavbrottKlient
       if (senastFråganTillDriftavbrott < DateTime.Now)
       {
         // Request som skickas
-        RestRequest restRequest = new RestRequest(PÅGÅENDE_PATH.TrimStart('/'), Method.Get);
+        RestRequest restRequest = new RestRequest(PÅGÅENDE_PATH.TrimStart('/'), Method.GET);
         restRequest.AddHeader("Accept", "application/xml,application/json");
         restRequest.RequestFormat = DataFormat.Xml;
 
@@ -128,7 +128,7 @@ namespace SE.MDH.DriftavbrottKlient
         restRequest.AddParameter(SYSTEM_PARAM, system);
         
         // Gör anropet
-        RestResponse<driftavbrottType> restResponse = restClient.Execute<driftavbrottType>(restRequest);
+        IRestResponse<driftavbrottType> restResponse = restClient.Execute<driftavbrottType>(restRequest);
         
         // Fick vi något svar alls?
         if (restResponse != null)
@@ -144,7 +144,7 @@ namespace SE.MDH.DriftavbrottKlient
             // Servern returnerade 404 eller 406 (HTTP Statuskod=404)
             if (restResponse.StatusCode == HttpStatusCode.NotFound)
             {
-              throw new ApplicationException($"#Driftavbrottstjänsten returnerade 404/406. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.Options.BaseHost}{restClient.Options.BaseUrl}.", new HttpException(404, "File Not Found"));
+              throw new ApplicationException($"#Driftavbrottstjänsten returnerade 404/406. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.", new HttpException(404, "File Not Found"));
             }
 
             // Servern returnerade inga driftavbrott alls (HTTP Statuskod=204, innehåll saknas)
@@ -161,13 +161,13 @@ namespace SE.MDH.DriftavbrottKlient
               return gällandeSvarFrånDriftavbrott;
             }
             // Servern returnerade någon form av annan statuskod som ej behandlas specifikt
-            throw new ApplicationException($"#Driftavbrottstjänsten returnerade en oväntad statuskod. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.Options.BaseHost}{restClient.Options.BaseUrl}.");
+            throw new ApplicationException($"#Driftavbrottstjänsten returnerade en oväntad statuskod. ResponseCode={numericStatusCode} {restResponse.StatusCode}, ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
           }
-          throw new ApplicationException($"Driftavbrottstjänsten svarar inte. ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.Options.BaseHost}{restClient.Options.BaseUrl}.");
+          throw new ApplicationException($"Driftavbrottstjänsten svarar inte. ResponseServer={restResponse.Server}, RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
         }
 
         // Servern returnerade inget svar (Response) alls
-        throw new ApplicationException($"#Fick inget svar från driftavbrottstjänsten. RequestBaseUrl={restClient.Options.BaseHost}{restClient.Options.BaseUrl}.");
+        throw new ApplicationException($"#Fick inget svar från driftavbrottstjänsten. RequestBaseUrl={restClient.BaseHost}{restClient.BaseUrl}.");
       }
       // returnerar senaste svaret.
       return gällandeSvarFrånDriftavbrott;
