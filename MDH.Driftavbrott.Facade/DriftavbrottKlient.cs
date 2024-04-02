@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using System.Configuration;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Web;
 
 // Interna beroenden
@@ -116,9 +115,8 @@ namespace SE.MDH.DriftavbrottKlient
       if (senastFråganTillDriftavbrott < DateTime.Now)
       {
         // Request som skickas
-        RestRequest restRequest = new RestRequest(PÅGÅENDE_PATH.TrimStart('/'), Method.GET);
+        IRestRequest restRequest = new RestRequest(PÅGÅENDE_PATH.TrimStart('/'), Method.GET);
         restRequest.AddHeader("Accept", "application/xml,application/json");
-        restRequest.RequestFormat = DataFormat.Xml;
 
         // lägg till parametrarna
         foreach (var kanal in kanaler)
